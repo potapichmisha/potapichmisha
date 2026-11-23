@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Allows restore/compile of net8.0-windows on non-Windows agents; runtime still requires Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+</Project>

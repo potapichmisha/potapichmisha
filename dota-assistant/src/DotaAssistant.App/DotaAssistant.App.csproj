@@ -9,7 +9,7 @@
     <RootNamespace>DotaAssistant.App</RootNamespace>
     <AssemblyName>DotaAssistant</AssemblyName>
     <Product>Помощник Dota 2</Product>
-    <Description>V1: DXGI + status panel (hero/allies/enemies/items/tips/confidence) + mid tips.</Description>
+    <Description>V1: DXGI + status panel (hero/side/allies/enemies/items/tips/confidence) + manual hero/side override + mid tips.</Description>
     <!-- WinUI 3 blocked in cloud Linux scaffold; WPF is the approved fallback. -->
   </PropertyGroup>
   <ItemGroup>

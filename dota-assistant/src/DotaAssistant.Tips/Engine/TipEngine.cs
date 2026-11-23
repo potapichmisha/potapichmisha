@@ -78,7 +78,8 @@ public sealed class TipEngine
             HeroId = context.HeroId,
             OpponentId = string.IsNullOrWhiteSpace(context.OpponentId) ? demo.OpponentId : context.OpponentId,
             Level = context.Level > 0 ? context.Level : Math.Max(1, demo.Level),
-            OwnedItemIds = context.OwnedItemIds
+            OwnedItemIds = context.OwnedItemIds,
+            SideId = context.SideId
         };
     }
 

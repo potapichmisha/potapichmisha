@@ -117,7 +117,12 @@
                          Foreground="{StaticResource TextBrush}"
                          FontSize="14"
                          FontWeight="SemiBold"
-                         Text="Ваш герой: —"/>
+                         Text="Ваш герой: — (авто)"/>
+              <TextBlock x:Name="StatusSideText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="13"
+                         Margin="0,6,0,0"
+                         Text="Сторона: не определена (авто)"/>
               <TextBlock x:Name="StatusAlliesText"
                          Foreground="{StaticResource TextBrush}"
                          FontSize="13"
@@ -161,6 +166,39 @@
                          Margin="0,8,0,0"
                          TextWrapping="Wrap"
                          Text="Источник: ожидание…"/>
+
+              <TextBlock Text="Если авто ошиблось — укажите вручную"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="11"
+                         Margin="0,14,0,6"/>
+              <Grid Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="12"/>
+                  <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="Ваш герой"
+                             Foreground="{StaticResource MutedBrush}"
+                             FontSize="11"
+                             Margin="0,0,0,4"/>
+                  <ComboBox x:Name="HeroOverrideCombo"
+                            SelectionChanged="HeroOverride_OnSelectionChanged"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                  <TextBlock Text="Сторона"
+                             Foreground="{StaticResource MutedBrush}"
+                             FontSize="11"
+                             Margin="0,0,0,4"/>
+                  <ComboBox x:Name="SideOverrideCombo"
+                            SelectionChanged="SideOverride_OnSelectionChanged"/>
+                </StackPanel>
+              </Grid>
+              <Button Content="Сбросить на авто"
+                      Padding="12,6"
+                      HorizontalAlignment="Left"
+                      Margin="0,0,0,4"
+                      Click="ClearOverrides_OnClick"/>
 
               <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                 <CheckBox x:Name="LiveRecognitionCheck"
@@ -217,7 +255,7 @@
                      Foreground="{StaticResource MutedBrush}"
                      FontSize="12"
                      Margin="0,0,0,12"
-                     Text="Dota 2: Borderless Windowed. Если топ-бар «плавает» — смотрите строку «Уверенность» и последние значения выше; советы идут только при уверенном герое."/>
+                     Text="Dota 2: Borderless Windowed. Если топ-бар «плавает» или герой неверный — задайте героя/сторону вручную; советы идут при уверенном авто-герое или ручной подстановке."/>
 
           <TextBlock Text="Детали mid-советов"
                      Foreground="{StaticResource TextBrush}"
@@ -264,7 +302,7 @@
           <TextBlock Margin="0,16,0,0"
                      FontSize="11"
                      Foreground="{StaticResource MutedBrush}"
-                     Text="V1 · статус-панель · mid tips · Windows"/>
+                     Text="V1 · статус-панель · ручной герой/сторона · mid tips · Windows"/>
         </StackPanel>
       </ScrollViewer>
     </DockPanel>

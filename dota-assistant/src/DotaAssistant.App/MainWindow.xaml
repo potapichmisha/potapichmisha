@@ -1,0 +1,171 @@
+<Window x:Class="DotaAssistant.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Помощник Dota 2"
+        Width="420" Height="520"
+        MinWidth="360" MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResizeWithGrip">
+  <Border x:Name="RootBorder"
+          Background="{StaticResource PanelBrush}"
+          BorderBrush="{StaticResource AccentBrush}"
+          BorderThickness="1"
+          CornerRadius="8"
+          Padding="0">
+    <DockPanel>
+      <!-- Custom title / drag area -->
+      <Border x:Name="TitleBar"
+              DockPanel.Dock="Top"
+              Background="#AA141A28"
+              Padding="12,8"
+              MouseLeftButtonDown="TitleBar_OnMouseLeftButtonDown">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <TextBlock Text="Помощник Dota 2"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource TextBrush}"/>
+            <TextBlock x:Name="ModeBadge"
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Center"
+                       FontSize="11"
+                       Foreground="{StaticResource MutedBrush}"
+                       Text="окно"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal">
+            <Button Content="─" Width="32" Height="28" Margin="0,0,4,0"
+                    Click="Minimize_OnClick" ToolTip="Свернуть"
+                    Background="Transparent" Foreground="{StaticResource TextBrush}" BorderThickness="0"/>
+            <Button Content="✕" Width="32" Height="28"
+                    Click="Close_OnClick" ToolTip="Закрыть"
+                    Background="Transparent" Foreground="{StaticResource TextBrush}" BorderThickness="0"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+        <StackPanel>
+          <!-- ToS -->
+          <Border Background="#33E0A050" CornerRadius="6" Padding="10" Margin="0,0,0,14">
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="{StaticResource WarnBrush}"
+                       FontSize="12"
+                       Text="Сторонний оверлей — на свой риск. Приложение только захватывает рабочий стол (DXGI), без ввода, инжекта и чтения памяти Dota 2. Не является читом. Соблюдайте ToS Valve."/>
+          </Border>
+
+          <TextBlock Text="Режим интерфейса"
+                     Foreground="{StaticResource TextBrush}"
+                     FontWeight="SemiBold"
+                     Margin="0,0,0,6"/>
+          <UniformGrid Columns="2" Margin="0,0,0,12">
+            <RadioButton x:Name="ModeWindowRadio"
+                         GroupName="UiMode"
+                         Content="Отдельное окно"
+                         IsChecked="True"
+                         Foreground="{StaticResource TextBrush}"
+                         Checked="UiMode_OnChecked"/>
+            <RadioButton x:Name="ModeOverlayRadio"
+                         GroupName="UiMode"
+                         Content="Оверлей"
+                         Foreground="{StaticResource TextBrush}"
+                         Checked="UiMode_OnChecked"/>
+          </UniformGrid>
+
+          <TextBlock Text="Прозрачность"
+                     Foreground="{StaticResource TextBrush}"
+                     FontWeight="SemiBold"
+                     Margin="0,0,0,4"/>
+          <Grid Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="48"/>
+            </Grid.ColumnDefinitions>
+            <Slider x:Name="OpacitySlider"
+                    Minimum="0.25" Maximum="1.0" Value="0.92"
+                    TickFrequency="0.05" IsSnapToTickEnabled="False"
+                    ValueChanged="OpacitySlider_OnValueChanged"/>
+            <TextBlock Grid.Column="1"
+                       x:Name="OpacityLabel"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource MutedBrush}"
+                       Text="92%"/>
+          </Grid>
+
+          <CheckBox x:Name="ClickThroughCheck"
+                    Content="Клик-through в режиме оверлея"
+                    Foreground="{StaticResource TextBrush}"
+                    Margin="0,0,0,12"
+                    Checked="ClickThrough_OnChanged"
+                    Unchecked="ClickThrough_OnChanged"/>
+
+          <TextBlock Text="Захват экрана (V0)"
+                     Foreground="{StaticResource TextBrush}"
+                     FontWeight="SemiBold"
+                     Margin="0,0,0,6"/>
+          <Border Background="#22141A28" CornerRadius="6" Padding="10" Margin="0,0,0,12">
+            <StackPanel>
+              <TextBlock x:Name="CaptureBackendText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="12"
+                         Text="Бэкенд: —"/>
+              <TextBlock x:Name="CaptureStatusText"
+                         Foreground="{StaticResource TextBrush}"
+                         Margin="0,4,0,0"
+                         Text="Статус: —"/>
+              <TextBlock x:Name="CaptureFpsText"
+                         Foreground="{StaticResource AccentBrush}"
+                         FontSize="20"
+                         FontWeight="SemiBold"
+                         Margin="0,8,0,0"
+                         Text="FPS: —"/>
+              <TextBlock x:Name="CaptureFrameText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="12"
+                         Margin="0,4,0,0"
+                         Text="Последний кадр: —"/>
+              <TextBlock x:Name="CaptureCountText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="12"
+                         Text="Кадров: 0"/>
+            </StackPanel>
+          </Border>
+
+          <TextBlock TextWrapping="Wrap"
+                     Foreground="{StaticResource MutedBrush}"
+                     FontSize="12"
+                     Margin="0,0,0,12"
+                     Text="Рекомендуемый режим Dota 2: Borderless Windowed. Vision / советы появятся в следующих версиях — сейчас только каркас захвата."/>
+
+          <TextBlock x:Name="HotkeyText"
+                     Foreground="{StaticResource TextBrush}"
+                     Margin="0,0,0,8"
+                     Text="Горячая клавиша скрыть/показать: Ctrl+Shift+H"/>
+
+          <StackPanel Orientation="Horizontal">
+            <Button x:Name="ToggleVisibilityButton"
+                    Content="Скрыть"
+                    Padding="14,6"
+                    Margin="0,0,8,0"
+                    Click="ToggleVisibility_OnClick"/>
+            <Button Content="Перезапустить захват"
+                    Padding="14,6"
+                    Click="RestartCapture_OnClick"/>
+          </StackPanel>
+
+          <TextBlock Margin="0,16,0,0"
+                     FontSize="11"
+                     Foreground="{StaticResource MutedBrush}"
+                     Text="V0 каркас · без AI · Windows"/>
+        </StackPanel>
+      </ScrollViewer>
+    </DockPanel>
+  </Border>
+</Window>

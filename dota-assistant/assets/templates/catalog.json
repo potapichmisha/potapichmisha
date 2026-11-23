@@ -9,6 +9,16 @@
       "id": "invoker",
       "name_ru": "Invoker",
       "file": "heroes/invoker.png"
+    },
+    {
+      "id": "shadow_fiend",
+      "name_ru": "Shadow Fiend",
+      "file": "heroes/shadow_fiend.png"
+    },
+    {
+      "id": "queen_of_pain",
+      "name_ru": "Queen of Pain",
+      "file": "heroes/queen_of_pain.png"
     }
   ],
   "items": [

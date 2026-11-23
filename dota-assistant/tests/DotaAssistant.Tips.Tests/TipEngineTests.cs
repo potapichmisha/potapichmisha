@@ -112,6 +112,22 @@ public class TipEngineTests
     }
 
     [Fact]
+    public void EnrichWithDemoDefaults_preserves_manual_side()
+    {
+        var engine = CreateEngine();
+        var enriched = engine.EnrichWithDemoDefaults(new TipContext
+        {
+            HeroId = "invoker",
+            SideId = "dire",
+            OwnedItemIds = Array.Empty<string>()
+        });
+
+        Assert.Equal("dire", enriched.SideId);
+        Assert.Equal("invoker", enriched.HeroId);
+        Assert.NotNull(enriched.OpponentId);
+    }
+
+    [Fact]
     public void Unknown_hero_returns_build_status_without_crash()
     {
         var engine = CreateEngine();

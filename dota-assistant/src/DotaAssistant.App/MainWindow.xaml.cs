@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -18,6 +19,7 @@ namespace DotaAssistant.App;
 public partial class MainWindow : Window
 {
     private readonly WindowChromeService _chrome;
+    private readonly PlayerOverrideState _overrides = new();
     private HotkeyService? _hotkey;
     private IScreenCapture? _capture;
     private readonly DispatcherTimer _statsTimer;
@@ -28,6 +30,8 @@ public partial class MainWindow : Window
     private TemplateCatalog? _catalog;
     private long _lastRecognizedPixelFrame = -1;
     private RecognitionResult? _lastResult;
+    private string _lastSourceRu = "ожидание…";
+    private bool _suppressOverrideEvents;
 
     public MainWindow()
     {
@@ -64,6 +68,8 @@ public partial class MainWindow : Window
         UpdateModeBadge();
         TryLoadTipEngine();
         TryLoadRecognizer();
+        PopulateOverrideCombos();
+        RefreshStatusPanel();
 
         await StartCaptureAsync().ConfigureAwait(true);
         _statsTimer.Start();
@@ -126,6 +132,35 @@ public partial class MainWindow : Window
         }
     }
 
+    private void PopulateOverrideCombos()
+    {
+        _suppressOverrideEvents = true;
+        try
+        {
+            HeroOverrideCombo.Items.Clear();
+            HeroOverrideCombo.Items.Add(new HeroPickItem(null, "Авто (распознавание)"));
+            if (_catalog is not null)
+            {
+                foreach (var hero in _catalog.Heroes.OrderBy(h => h.DisplayNameRu, StringComparer.OrdinalIgnoreCase))
+                {
+                    HeroOverrideCombo.Items.Add(new HeroPickItem(hero.Id, hero.DisplayNameRu));
+                }
+            }
+
+            HeroOverrideCombo.SelectedIndex = 0;
+
+            SideOverrideCombo.Items.Clear();
+            SideOverrideCombo.Items.Add(new SidePickItem(null, "Авто (не определена)"));
+            SideOverrideCombo.Items.Add(new SidePickItem(PlayerSide.Radiant, "Radiant"));
+            SideOverrideCombo.Items.Add(new SidePickItem(PlayerSide.Dire, "Dire"));
+            SideOverrideCombo.SelectedIndex = 0;
+        }
+        finally
+        {
+            _suppressOverrideEvents = false;
+        }
+    }
+
     private async Task StartCaptureAsync()
     {
         if (_capture is not null)
@@ -181,7 +216,7 @@ public partial class MainWindow : Window
 
         if (!_capture.TryCloneLatestPixels(out var pixels) || pixels is null)
         {
-            if (_lastResult is null)
+            if (_lastResult is null && !_overrides.HasHeroOverride)
             {
                 StatusSourceText.Text =
                     "Источник: живое распознавание ждёт DXGI-пиксели. На Linux/удалёнке — только «Тест на фикстуре».";
@@ -289,6 +324,7 @@ public partial class MainWindow : Window
             if (_recognizer is null)
             {
                 TryLoadRecognizer();
+                PopulateOverrideCombos();
             }
 
             if (_recognizer is null)
@@ -313,25 +349,110 @@ public partial class MainWindow : Window
         }
     }
 
+    private void HeroOverride_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressOverrideEvents || !IsLoaded)
+        {
+            return;
+        }
+
+        if (HeroOverrideCombo.SelectedItem is HeroPickItem pick)
+        {
+            if (pick.Id is null)
+            {
+                _overrides.ClearHero();
+            }
+            else
+            {
+                _overrides.HeroId = pick.Id;
+                _overrides.HeroDisplayNameRu = pick.DisplayNameRu;
+            }
+        }
+
+        RefreshStatusPanel();
+    }
+
+    private void SideOverride_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressOverrideEvents || !IsLoaded)
+        {
+            return;
+        }
+
+        if (SideOverrideCombo.SelectedItem is SidePickItem pick)
+        {
+            _overrides.Side = pick.Side;
+        }
+
+        RefreshStatusPanel();
+    }
+
+    private void ClearOverrides_OnClick(object sender, RoutedEventArgs e)
+    {
+        _overrides.ClearAll();
+        _suppressOverrideEvents = true;
+        try
+        {
+            HeroOverrideCombo.SelectedIndex = 0;
+            SideOverrideCombo.SelectedIndex = 0;
+        }
+        finally
+        {
+            _suppressOverrideEvents = false;
+        }
+
+        RefreshStatusPanel();
+    }
+
     private void ApplyRecognition(RecognitionResult result, string sourceRu)
     {
         _lastResult = result;
-
-        StatusHeroText.Text = RecognitionStatusFormatter.FormatHero(result.Hero);
-        StatusAlliesText.Text = RecognitionStatusFormatter.FormatAllies(result.Allies);
-        StatusEnemiesText.Text = RecognitionStatusFormatter.FormatEnemies(result.Enemies);
-        StatusItemsText.Text = RecognitionStatusFormatter.FormatItems(result.InventoryItems);
-        StatusConfidenceText.Text = RecognitionStatusFormatter.FormatConfidence(result);
-        StatusSourceText.Text = $"Источник: {sourceRu} · layout {result.LayoutName} · {result.FrameWidth}×{result.FrameHeight}";
-
-        StatusConfidenceText.Foreground = result.HasConfidentHero
-            ? (Brush)FindResource("AccentBrush")
-            : (Brush)FindResource("WarnBrush");
-
-        ApplyTipsFromRecognition(result);
+        _lastSourceRu = sourceRu;
+        RefreshStatusPanel();
     }
 
-    private void ApplyTipsFromRecognition(RecognitionResult result)
+    private void RefreshStatusPanel()
+    {
+        var identity = PlayerIdentityResolver.Resolve(_lastResult, _overrides);
+
+        StatusHeroText.Text = RecognitionStatusFormatter.FormatEffectiveHero(identity);
+        StatusSideText.Text = RecognitionStatusFormatter.FormatSide(identity);
+
+        if (_lastResult is not null)
+        {
+            StatusAlliesText.Text = RecognitionStatusFormatter.FormatAllies(_lastResult.Allies);
+            StatusEnemiesText.Text = RecognitionStatusFormatter.FormatEnemies(_lastResult.Enemies);
+            StatusItemsText.Text = RecognitionStatusFormatter.FormatItems(_lastResult.InventoryItems);
+            StatusConfidenceText.Text = RecognitionStatusFormatter.FormatConfidence(_lastResult, identity);
+            StatusSourceText.Text =
+                $"Источник: {_lastSourceRu} · layout {_lastResult.LayoutName} · {_lastResult.FrameWidth}×{_lastResult.FrameHeight}";
+
+            var confident = identity.HasUsableHero;
+            StatusConfidenceText.Foreground = confident
+                ? (Brush)FindResource("AccentBrush")
+                : (Brush)FindResource("WarnBrush");
+        }
+        else
+        {
+            StatusAlliesText.Text = "Союзники: —";
+            StatusEnemiesText.Text = "Противники: —";
+            StatusItemsText.Text = "Предметы: —";
+            StatusConfidenceText.Text = identity.HeroIsManual
+                ? "Уверенность: герой задан вручную (распознавания ещё не было)."
+                : "Уверенность: —";
+            StatusConfidenceText.Foreground = identity.HeroIsManual
+                ? (Brush)FindResource("AccentBrush")
+                : (Brush)FindResource("WarnBrush");
+            if (_recognizer is not null)
+            {
+                StatusSourceText.Text = "Источник: ожидание кадра или теста на фикстуре.";
+            }
+        }
+
+        ApplyTipsFromIdentity(identity);
+    }
+
+    private void ApplyTipsFromIdentity(EffectivePlayerIdentity identity)
     {
         if (_tipEngine is null)
         {
@@ -346,31 +467,39 @@ public partial class MainWindow : Window
             return;
         }
 
-        if (!result.HasConfidentHero || result.Hero is null)
+        if (!identity.HasUsableHero || string.IsNullOrWhiteSpace(identity.HeroId))
         {
-            var guess = result.Hero is null
+            var guess = identity.HeroId is null
                 ? "герой не распознан"
-                : $"не уверен ({result.Hero.DisplayNameRu} {result.Hero.Confidence:P0})";
-            StatusTipText.Text = $"Совет: нет — {guess}. При низкой уверенности советы не даём.";
+                : $"не уверен ({identity.HeroDisplayNameRu} {identity.HeroConfidence:P0})";
+            StatusTipText.Text = $"Совет: нет — {guess}. При низкой уверенности советы не даём (или задайте героя вручную).";
             TipsContextText.Text = $"Контекст: {guess}.";
             TipsItemsText.Text = "—";
-            TipsStatusText.Text = "Нужен уверенный герой (порог шаблона). Смотрите строку «Уверенность».";
+            TipsStatusText.Text = "Нужен уверенный герой (авто) или ручная подстановка. Смотрите «Ваш герой».";
             return;
         }
 
-        var owned = result.InventoryItems
+        var owned = _lastResult?.InventoryItems
             .Where(i => i.IsConfident)
             .Select(i => i.Id)
-            .ToArray();
+            .ToArray() ?? Array.Empty<string>();
 
         // Prefer a confident enemy as mid opponent when available; else demo default.
-        var opponent = result.Enemies.FirstOrDefault(e => e.IsConfident)?.Id;
+        var opponent = _lastResult?.Enemies.FirstOrDefault(e => e.IsConfident)?.Id;
+
+        var sideId = identity.Side switch
+        {
+            PlayerSide.Radiant => "radiant",
+            PlayerSide.Dire => "dire",
+            _ => null
+        };
 
         var context = _tipEngine.EnrichWithDemoDefaults(new TipContext
         {
-            HeroId = result.Hero.Id,
+            HeroId = identity.HeroId,
             OpponentId = opponent,
-            OwnedItemIds = owned
+            OwnedItemIds = owned,
+            SideId = sideId
         });
         var advice = _tipEngine.Advise(context);
 
@@ -378,8 +507,14 @@ public partial class MainWindow : Window
             ?? advice.MatchupStatusRu
             ?? "Матчап: —";
 
-        TipsContextText.Text = advice.DemoContextRu
-            ?? $"Контекст: {_tipEngine.Store.HeroNameRu(result.Hero.Id)}, уровень {context.Level}.";
+        var modeNote = identity.HeroIsManual ? "вручную" : "авто";
+        var sideNote = identity.Side is null
+            ? "сторона не задана"
+            : $"{RecognitionStatusFormatter.FormatSideName(identity.Side.Value)} ({identity.SideModeRu})";
+
+        TipsContextText.Text = (advice.DemoContextRu
+            ?? $"Контекст: {_tipEngine.Store.HeroNameRu(identity.HeroId)}, уровень {context.Level}.")
+            + $" · герой {modeNote} · {sideNote}";
 
         if (advice.NextItems.Count == 0)
         {
@@ -401,7 +536,9 @@ public partial class MainWindow : Window
             TipsItemsText.Text = sb.ToString();
         }
 
-        TipsStatusText.Text = "Локальные JSON-правила mid · шаблонные фразы · без LLM.";
+        TipsStatusText.Text = identity.HeroIsManual
+            ? "Локальные JSON-правила mid · герой задан вручную · без LLM."
+            : "Локальные JSON-правила mid · шаблонные фразы · без LLM.";
     }
 
     private void TitleBar_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -415,4 +552,14 @@ public partial class MainWindow : Window
     private void Minimize_OnClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
     private void Close_OnClick(object sender, RoutedEventArgs e) => Close();
+
+    private sealed record HeroPickItem(string? Id, string DisplayNameRu)
+    {
+        public override string ToString() => DisplayNameRu;
+    }
+
+    private sealed record SidePickItem(PlayerSide? Side, string DisplayNameRu)
+    {
+        public override string ToString() => DisplayNameRu;
+    }
 }

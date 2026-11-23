@@ -12,4 +12,11 @@ public sealed class TipContext
     public int Level { get; init; }
 
     public IReadOnlyList<string> OwnedItemIds { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Optional team side (Radiant/Dire). Set by manual override when recognition has no side.
+    /// Values: "radiant", "dire", or null.
+    /// </summary>
+    public string? SideId { get; init; }
 }
+

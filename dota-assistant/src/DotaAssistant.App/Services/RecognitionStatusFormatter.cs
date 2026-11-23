@@ -1,5 +1,6 @@
 using System.Text;
 using DotaAssistant.Vision.Models;
+using DotaAssistant.Vision.Recognition;
 
 namespace DotaAssistant.App.Services;
 
@@ -10,6 +11,53 @@ public static class RecognitionStatusFormatter
 {
     public static string FormatHero(MatchCandidate? hero)
         => FormatSingle("Ваш герой", hero);
+
+    public static string FormatEffectiveHero(EffectivePlayerIdentity identity)
+    {
+        if (string.IsNullOrWhiteSpace(identity.HeroId))
+        {
+            return $"Ваш герой: — ({identity.HeroModeRu})";
+        }
+
+        var name = string.IsNullOrWhiteSpace(identity.HeroDisplayNameRu)
+            ? identity.HeroId
+            : identity.HeroDisplayNameRu;
+
+        if (identity.HeroIsManual)
+        {
+            return $"Ваш герой: {name} ({identity.HeroModeRu})";
+        }
+
+        if (identity.HeroConfidence is { } conf)
+        {
+            if (identity.HasUsableHero)
+            {
+                return $"Ваш герой: {name} ({conf:P0}, {identity.HeroModeRu})";
+            }
+
+            return $"Ваш герой: не уверен — {name} ({conf:P0}, {identity.HeroModeRu})";
+        }
+
+        return $"Ваш герой: {name} ({identity.HeroModeRu})";
+    }
+
+    public static string FormatSide(EffectivePlayerIdentity identity)
+    {
+        if (identity.Side is null)
+        {
+            return $"Сторона: не определена ({identity.SideModeRu})";
+        }
+
+        var sideRu = FormatSideName(identity.Side.Value);
+        return $"Сторона: {sideRu} ({identity.SideModeRu})";
+    }
+
+    public static string FormatSideName(PlayerSide side) => side switch
+    {
+        PlayerSide.Radiant => "Radiant",
+        PlayerSide.Dire => "Dire",
+        _ => side.ToString()
+    };
 
     public static string FormatAllies(IReadOnlyList<MatchCandidate> allies)
         => FormatList("Союзники", allies);
@@ -28,8 +76,16 @@ public static class RecognitionStatusFormatter
         return "Предметы: " + string.Join(", ", parts);
     }
 
-    public static string FormatConfidence(RecognitionResult result)
+    public static string FormatConfidence(RecognitionResult result, EffectivePlayerIdentity? identity = null)
     {
+        if (identity is { HeroIsManual: true })
+        {
+            var autoNote = result.Hero is null
+                ? "авто: нет совпадений"
+                : $"авто угадало: {result.Hero.DisplayNameRu} ({result.Hero.Confidence:P0})";
+            return $"Уверенность: герой задан вручную; {autoNote}.";
+        }
+
         if (result.Hero is null)
         {
             return "Уверенность: нет совпадений (топ-бар пуст или шаблоны не подошли).";

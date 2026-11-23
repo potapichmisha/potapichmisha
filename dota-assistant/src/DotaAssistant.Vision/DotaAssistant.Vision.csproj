@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>DotaAssistant.Vision</RootNamespace>
+    <Description>ROI crop + template matching for Dota 2 HUD icons (V0.5). No third-party image SDK.</Description>
+  </PropertyGroup>
+</Project>

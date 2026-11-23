@@ -9,10 +9,17 @@
     <RootNamespace>DotaAssistant.App</RootNamespace>
     <AssemblyName>DotaAssistant</AssemblyName>
     <Product>Помощник Dota 2</Product>
-    <Description>V0 каркас: DXGI-захват, оверлей/окно, прозрачность, горячая клавиша.</Description>
+    <Description>V0.5: DXGI-захват + ROI/template matching героя и предметов.</Description>
     <!-- WinUI 3 blocked in cloud Linux scaffold; WPF is the approved fallback. -->
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotaAssistant.Capture\DotaAssistant.Capture.csproj" />
+    <ProjectReference Include="..\DotaAssistant.Vision\DotaAssistant.Vision.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\assets\**\*"
+             Link="assets\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest"
+             CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

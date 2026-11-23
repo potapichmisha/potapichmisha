@@ -1,8 +1,11 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DotaAssistant.App.Services;
 using DotaAssistant.Capture;
+using DotaAssistant.Vision.Catalog;
+using DotaAssistant.Vision.Recognition;
 
 namespace DotaAssistant.App;
 
@@ -154,6 +157,45 @@ public partial class MainWindow : Window
     private async void RestartCapture_OnClick(object sender, RoutedEventArgs e)
     {
         await StartCaptureAsync().ConfigureAwait(true);
+    }
+
+    private void RunFixtureRecognition_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var baseDir = AppContext.BaseDirectory;
+            var templates = Path.Combine(baseDir, "assets", "templates");
+            var fixture = Path.Combine(baseDir, "assets", "fixtures", "match_hud_1920x1080.png");
+            if (!Directory.Exists(templates) || !File.Exists(fixture))
+            {
+                RecognitionStatusText.Text = "Не найдены assets/templates или фикстура. Пересоберите проект.";
+                return;
+            }
+
+            var catalog = TemplateCatalog.LoadFromDirectory(templates);
+            var result = new FrameRecognizer(catalog, maxInventorySlots: 2).RecognizeFile(fixture);
+
+            RecognitionHeroText.Text = result.Hero is null
+                ? "Герой: не уверен"
+                : $"Герой: {result.Hero.DisplayNameRu} ({result.Hero.Confidence:P0})";
+
+            if (result.InventoryItems.Count == 0)
+            {
+                RecognitionItemsText.Text = "Предметы: —";
+            }
+            else
+            {
+                var parts = result.InventoryItems.Select(i =>
+                    $"{i.DisplayNameRu} ({i.Confidence:P0})");
+                RecognitionItemsText.Text = "Предметы: " + string.Join(", ", parts);
+            }
+
+            RecognitionStatusText.Text = "Ок: тест на синтетической фикстуре (не кадр живой Dota).";
+        }
+        catch (Exception ex)
+        {
+            RecognitionStatusText.Text = $"Ошибка распознавания: {ex.Message}";
+        }
     }
 
     private void TitleBar_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -10,9 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FE6D361F-819
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Vision", "src\DotaAssistant.Vision\DotaAssistant.Vision.csproj", "{5730D8A8-B491-4FCF-B835-856E5082FF4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Tips", "src\DotaAssistant.Tips\DotaAssistant.Tips.csproj", "{C3D4E5F6-A7B8-9012-CDEF-123456789012}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BCAB5C78-9B2C-4123-9C8B-6A7D19E55E6A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Vision.Tests", "tests\DotaAssistant.Vision.Tests\DotaAssistant.Vision.Tests.csproj", "{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Tips.Tests", "tests\DotaAssistant.Tips.Tests\DotaAssistant.Tips.Tests.csproj", "{D4E5F6A7-B8C9-0123-DEF0-234567890123}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,13 +36,23 @@ Global
 		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012}.Release|Any CPU.Build.0 = Release|Any CPU
 		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4E5F6A7-B8C9-0123-DEF0-234567890123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E5F6A7-B8C9-0123-DEF0-234567890123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E5F6A7-B8C9-0123-DEF0-234567890123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E5F6A7-B8C9-0123-DEF0-234567890123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5730D8A8-B491-4FCF-B835-856E5082FF4B} = {FE6D361F-8192-450F-A88C-A8A8CD3F4560}
+		{C3D4E5F6-A7B8-9012-CDEF-123456789012} = {FE6D361F-8192-450F-A88C-A8A8CD3F4560}
 		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4} = {BCAB5C78-9B2C-4123-9C8B-6A7D19E55E6A}
+		{D4E5F6A7-B8C9-0123-DEF0-234567890123} = {BCAB5C78-9B2C-4123-9C8B-6A7D19E55E6A}
 	EndGlobalSection
 EndGlobal

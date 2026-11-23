@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>DotaAssistant.Tips</RootNamespace>
+    <Description>Local JSON tip engine: mid matchups + item builds with Russian template phrases (V1-alpha).</Description>
+  </PropertyGroup>
+</Project>

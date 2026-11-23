@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Помощник Dota 2"
-        Width="440" Height="760"
-        MinWidth="360" MinHeight="560"
+        Width="460" Height="820"
+        MinWidth="380" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -16,7 +16,6 @@
           CornerRadius="8"
           Padding="0">
     <DockPanel>
-      <!-- Custom title / drag area -->
       <Border x:Name="TitleBar"
               DockPanel.Dock="Top"
               Background="#AA141A28"
@@ -52,7 +51,6 @@
 
       <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
         <StackPanel>
-          <!-- ToS -->
           <Border Background="#33E0A050" CornerRadius="6" Padding="10" Margin="0,0,0,14">
             <TextBlock TextWrapping="Wrap"
                        Foreground="{StaticResource WarnBrush}"
@@ -102,11 +100,83 @@
           <CheckBox x:Name="ClickThroughCheck"
                     Content="Клик-through в режиме оверлея"
                     Foreground="{StaticResource TextBrush}"
-                    Margin="0,0,0,12"
+                    Margin="0,0,0,14"
                     Checked="ClickThrough_OnChanged"
                     Unchecked="ClickThrough_OnChanged"/>
 
-          <TextBlock Text="Захват экрана (V0)"
+          <!-- Ordered status panel: beginner-facing recognition readout -->
+          <TextBlock Text="Статус распознавания"
+                     Foreground="{StaticResource TextBrush}"
+                     FontWeight="SemiBold"
+                     FontSize="15"
+                     Margin="0,0,0,6"/>
+          <Border Background="#33141A28" CornerRadius="6" Padding="12" Margin="0,0,0,12"
+                  BorderBrush="#443D9B8F" BorderThickness="1">
+            <StackPanel>
+              <TextBlock x:Name="StatusHeroText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="14"
+                         FontWeight="SemiBold"
+                         Text="Ваш герой: —"/>
+              <TextBlock x:Name="StatusAlliesText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="13"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="Союзники: —"/>
+              <TextBlock x:Name="StatusEnemiesText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="13"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="Противники: —"/>
+              <TextBlock x:Name="StatusItemsText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="13"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="Предметы: —"/>
+
+              <TextBlock Text="Текущий совет / матчап"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="11"
+                         Margin="0,12,0,4"/>
+              <TextBlock x:Name="StatusTipText"
+                         Foreground="{StaticResource AccentBrush}"
+                         FontSize="13"
+                         TextWrapping="Wrap"
+                         Text="—"/>
+
+              <TextBlock x:Name="StatusConfidenceText"
+                         Foreground="{StaticResource WarnBrush}"
+                         FontSize="12"
+                         FontWeight="SemiBold"
+                         Margin="0,12,0,0"
+                         TextWrapping="Wrap"
+                         Text="Уверенность: —"/>
+
+              <TextBlock x:Name="StatusSourceText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="11"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="Источник: ожидание…"/>
+
+              <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                <CheckBox x:Name="LiveRecognitionCheck"
+                          Content="Живое распознавание"
+                          IsChecked="True"
+                          Foreground="{StaticResource TextBrush}"
+                          VerticalAlignment="Center"
+                          Margin="0,0,12,0"/>
+                <Button Content="Тест на фикстуре"
+                        Padding="12,6"
+                        Click="RunFixtureRecognition_OnClick"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="Захват экрана"
                      Foreground="{StaticResource TextBrush}"
                      FontWeight="SemiBold"
                      Margin="0,0,0,6"/>
@@ -135,6 +205,11 @@
                          Foreground="{StaticResource MutedBrush}"
                          FontSize="12"
                          Text="Кадров: 0"/>
+              <TextBlock x:Name="CapturePixelsText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="12"
+                         Margin="0,4,0,0"
+                         Text="Пиксели для vision: —"/>
             </StackPanel>
           </Border>
 
@@ -142,37 +217,9 @@
                      Foreground="{StaticResource MutedBrush}"
                      FontSize="12"
                      Margin="0,0,0,12"
-                     Text="Рекомендуемый режим Dota 2: Borderless Windowed. Живое распознавание с DXGI-кадра — позже; сейчас — тест на фикстуре + mid-советы."/>
+                     Text="Dota 2: Borderless Windowed. Если топ-бар «плавает» — смотрите строку «Уверенность» и последние значения выше; советы идут только при уверенном герое."/>
 
-          <TextBlock Text="Распознавание (V0.5)"
-                     Foreground="{StaticResource TextBrush}"
-                     FontWeight="SemiBold"
-                     Margin="0,0,0,6"/>
-          <Border Background="#22141A28" CornerRadius="6" Padding="10" Margin="0,0,0,12">
-            <StackPanel>
-              <TextBlock x:Name="RecognitionHeroText"
-                         Foreground="{StaticResource TextBrush}"
-                         Text="Герой: —"/>
-              <TextBlock x:Name="RecognitionItemsText"
-                         Foreground="{StaticResource MutedBrush}"
-                         FontSize="12"
-                         Margin="0,4,0,0"
-                         Text="Предметы: —"/>
-              <TextBlock x:Name="RecognitionStatusText"
-                         Foreground="{StaticResource MutedBrush}"
-                         FontSize="11"
-                         Margin="0,6,0,0"
-                         TextWrapping="Wrap"
-                         Text="Нажмите кнопку: распознать тестовый HUD и показать mid-советы."/>
-              <Button Content="Тест на фикстуре + советы"
-                      Margin="0,10,0,0"
-                      Padding="14,6"
-                      HorizontalAlignment="Left"
-                      Click="RunFixtureRecognition_OnClick"/>
-            </StackPanel>
-          </Border>
-
-          <TextBlock Text="Советы mid (V1-alpha)"
+          <TextBlock Text="Детали mid-советов"
                      Foreground="{StaticResource TextBrush}"
                      FontWeight="SemiBold"
                      Margin="0,0,0,6"/>
@@ -183,22 +230,10 @@
                          FontSize="11"
                          TextWrapping="Wrap"
                          Text="Контекст: —"/>
-              <TextBlock Text="Матчап"
-                         Foreground="{StaticResource TextBrush}"
-                         FontWeight="SemiBold"
-                         Margin="0,10,0,4"/>
-              <TextBlock x:Name="TipsMatchupText"
-                         Foreground="{StaticResource AccentBrush}"
-                         FontSize="13"
-                         TextWrapping="Wrap"
-                         Text="—"/>
-              <TextBlock Text="Следующие предметы"
-                         Foreground="{StaticResource TextBrush}"
-                         FontWeight="SemiBold"
-                         Margin="0,12,0,4"/>
               <TextBlock x:Name="TipsItemsText"
                          Foreground="{StaticResource TextBrush}"
-                         FontSize="13"
+                         FontSize="12"
+                         Margin="0,8,0,0"
                          TextWrapping="Wrap"
                          Text="—"/>
               <TextBlock x:Name="TipsStatusText"
@@ -229,7 +264,7 @@
           <TextBlock Margin="0,16,0,0"
                      FontSize="11"
                      Foreground="{StaticResource MutedBrush}"
-                     Text="V1-alpha · mid tips · шаблоны RU · без LLM · Windows"/>
+                     Text="V1 · статус-панель · mid tips · Windows"/>
         </StackPanel>
       </ScrollViewer>
     </DockPanel>

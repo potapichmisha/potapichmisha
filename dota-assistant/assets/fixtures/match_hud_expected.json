@@ -1,5 +1,13 @@
 {
   "hero_id": "pudge",
+  "ally_ids": [
+    "invoker",
+    "shadow_fiend"
+  ],
+  "enemy_ids": [
+    "queen_of_pain",
+    "invoker"
+  ],
   "inventory_ids": [
     "blink_dagger",
     "bottle"
@@ -11,5 +19,5 @@
     1920,
     1080
   ],
-  "note_ru": "Синтетический HUD для тестов V0.5/V1-alpha (не скриншот реальной Dota). Оппонент/уровень — демо для советов mid."
+  "note_ru": "Синтетический HUD для тестов статуса распознавания (не скриншот реальной Dota)."
 }

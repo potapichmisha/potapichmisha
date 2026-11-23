@@ -44,6 +44,8 @@ public sealed class NormalizedCrossCorrelationMatcher : ITemplateMatcher
             }
         }
 
+        // Always return the best guess so the UI can show «не уверен» + last guess;
+        // callers must check IsConfident before treating the id as reliable.
         return best;
     }
 

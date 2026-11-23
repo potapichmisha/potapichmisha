@@ -3,15 +3,18 @@ using SharpGen.Runtime;
 using Vortice.Direct3D;
 using Vortice.Direct3D11;
 using Vortice.DXGI;
+using MapFlags = Vortice.Direct3D11.MapFlags;
 
 namespace DotaAssistant.Capture;
 
 /// <summary>
-/// DXGI Desktop Duplication capture loop. V0 acquires frames for FPS/timestamp only;
-/// no vision analysis and no game process interaction.
+/// DXGI Desktop Duplication capture loop. Tracks FPS and periodically copies a BGRA
+/// frame to CPU memory for local vision (no game process interaction).
 /// </summary>
 public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
 {
+    private const int PixelCopyIntervalMs = 400;
+
     private readonly object _sync = new();
     private CancellationTokenSource? _loopCts;
     private Task? _loopTask;
@@ -19,6 +22,7 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
     private ID3D11Device? _device;
     private ID3D11DeviceContext? _context;
     private IDXGIOutputDuplication? _duplication;
+    private ID3D11Texture2D? _staging;
     private int _width;
     private int _height;
 
@@ -28,6 +32,14 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
     private string _status = "Остановлен";
     private readonly Stopwatch _fpsWindow = new();
     private int _fpsWindowFrames;
+    private readonly Stopwatch _pixelCopyWatch = new();
+
+    private byte[]? _latestBgra;
+    private int _latestWidth;
+    private int _latestHeight;
+    private int _latestPitch;
+    private DateTimeOffset _latestPixelAt;
+    private long _latestPixelFrameIndex;
 
     public CaptureStats GetStats()
     {
@@ -41,6 +53,31 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
                 Status = _status,
                 Backend = "DXGI Desktop Duplication"
             };
+        }
+    }
+
+    public bool TryCloneLatestPixels(out CapturePixelFrame? frame)
+    {
+        lock (_sync)
+        {
+            if (_latestBgra is null || _latestWidth <= 0 || _latestHeight <= 0)
+            {
+                frame = null;
+                return false;
+            }
+
+            var clone = new byte[_latestBgra.Length];
+            Buffer.BlockCopy(_latestBgra, 0, clone, 0, _latestBgra.Length);
+            frame = new CapturePixelFrame
+            {
+                Width = _latestWidth,
+                Height = _latestHeight,
+                RowPitch = _latestPitch,
+                BgraPixels = clone,
+                CapturedAt = _latestPixelAt,
+                FrameIndex = _latestPixelFrameIndex
+            };
+            return true;
         }
     }
 
@@ -149,10 +186,8 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
         _fps = 0;
         _fpsWindowFrames = 0;
         _fpsWindow.Restart();
-
-        // Silence unused field warnings until ROI work uses dimensions.
-        _ = _width;
-        _ = _height;
+        _pixelCopyWatch.Restart();
+        _latestBgra = null;
     }
 
     private void CaptureLoop(CancellationToken token)
@@ -206,6 +241,26 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
 
                 try
                 {
+                    if (desktopResource is not null
+                        && _pixelCopyWatch.ElapsedMilliseconds >= PixelCopyIntervalMs
+                        && _device is not null
+                        && _context is not null)
+                    {
+                        try
+                        {
+                            using var texture = desktopResource.QueryInterface<ID3D11Texture2D>();
+                            CopyTextureToCpu(texture);
+                            _pixelCopyWatch.Restart();
+                        }
+                        catch (Exception ex)
+                        {
+                            lock (_sync)
+                            {
+                                _status = $"Копия кадра: {ex.Message}";
+                            }
+                        }
+                    }
+
                     desktopResource?.Dispose();
                     _duplication.ReleaseFrame();
 
@@ -222,7 +277,14 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
                             _fpsWindow.Restart();
                         }
 
-                        _status = "Захват…";
+                        if (_status.StartsWith("Копия кадра:", StringComparison.Ordinal))
+                        {
+                            // keep copy error visible briefly
+                        }
+                        else
+                        {
+                            _status = _latestBgra is null ? "Захват… (ждём пиксели)" : "Захват…";
+                        }
                     }
                 }
                 catch
@@ -243,13 +305,95 @@ public sealed class DxgiDesktopDuplicationCapture : IScreenCapture
         }
     }
 
+    private void CopyTextureToCpu(ID3D11Texture2D source)
+    {
+        if (_device is null || _context is null)
+        {
+            return;
+        }
+
+        var desc = source.Description;
+        EnsureStaging(desc.Width, desc.Height, desc.Format);
+        if (_staging is null)
+        {
+            return;
+        }
+
+        _context.CopyResource(_staging, source);
+        var mapped = _context.Map(_staging, 0, MapMode.Read, MapFlags.None);
+        try
+        {
+            var pitch = (int)mapped.RowPitch;
+            var height = (int)desc.Height;
+            var width = (int)desc.Width;
+            var needed = pitch * height;
+            var buffer = new byte[needed];
+            System.Runtime.InteropServices.Marshal.Copy(mapped.DataPointer, buffer, 0, needed);
+
+            lock (_sync)
+            {
+                _latestBgra = buffer;
+                _latestWidth = width;
+                _latestHeight = height;
+                _latestPitch = pitch;
+                _latestPixelAt = DateTimeOffset.Now;
+                _latestPixelFrameIndex = _frameCount + 1;
+            }
+        }
+        finally
+        {
+            _context.Unmap(_staging, 0);
+        }
+    }
+
+    private void EnsureStaging(uint width, uint height, Format format)
+    {
+        if (_device is null)
+        {
+            return;
+        }
+
+        if (_staging is not null)
+        {
+            var existing = _staging.Description;
+            if (existing.Width == width && existing.Height == height && existing.Format == format)
+            {
+                return;
+            }
+
+            _staging.Dispose();
+            _staging = null;
+        }
+
+        var stagingDesc = new Texture2DDescription
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = format,
+            SampleDescription = new SampleDescription(1, 0),
+            Usage = ResourceUsage.Staging,
+            BindFlags = BindFlags.None,
+            CPUAccessFlags = CpuAccessFlags.Read,
+            MiscFlags = ResourceOptionFlags.None
+        };
+
+        _staging = _device.CreateTexture2D(stagingDesc);
+        _width = (int)width;
+        _height = (int)height;
+    }
+
     private void ReleaseDuplication()
     {
+        _staging?.Dispose();
+        _staging = null;
         _duplication?.Dispose();
         _duplication = null;
         _context?.Dispose();
         _context = null;
         _device?.Dispose();
         _device = null;
+        _latestBgra = null;
     }
 }

@@ -3,7 +3,7 @@ using DotaAssistant.Vision.Models;
 namespace DotaAssistant.Vision.Layout;
 
 /// <summary>
-/// Fixed HUD ROI map for a reference resolution. V0.5 uses synthetic Full HD fixtures;
+/// Fixed HUD ROI map for a reference resolution. V0.5/V1 use synthetic Full HD fixtures;
 /// real Dota HUD calibration can replace these rectangles later.
 /// </summary>
 public sealed class HudLayout
@@ -12,6 +12,8 @@ public sealed class HudLayout
     public required int ReferenceWidth { get; init; }
     public required int ReferenceHeight { get; init; }
     public required RoiRect PlayerHeroTopBar { get; init; }
+    public required IReadOnlyList<RoiRect> AllyTopBarSlots { get; init; }
+    public required IReadOnlyList<RoiRect> EnemyTopBarSlots { get; init; }
     public required IReadOnlyList<RoiRect> InventorySlots { get; init; }
 
     public HudLayout ScaleTo(int frameWidth, int frameHeight)
@@ -30,6 +32,8 @@ public sealed class HudLayout
             ReferenceWidth = frameWidth,
             ReferenceHeight = frameHeight,
             PlayerHeroTopBar = ScaleRoi(PlayerHeroTopBar, sx, sy),
+            AllyTopBarSlots = AllyTopBarSlots.Select(r => ScaleRoi(r, sx, sy)).ToArray(),
+            EnemyTopBarSlots = EnemyTopBarSlots.Select(r => ScaleRoi(r, sx, sy)).ToArray(),
             InventorySlots = InventorySlots.Select(r => ScaleRoi(r, sx, sy)).ToArray()
         };
     }

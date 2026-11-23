@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate synthetic HUD icon templates and a 1920x1080 fixture for V0.5 tests.
+"""Generate synthetic HUD icon templates and a 1920x1080 fixture for recognition tests.
 
 Uses only the Python standard library (zlib + struct) so it runs without Pillow.
 """
@@ -16,7 +16,11 @@ TEMPLATES = ROOT / "assets" / "templates"
 FIXTURES = ROOT / "assets" / "fixtures"
 
 # Must match HudLayoutPresets.SyntheticFullHd
-HERO_ROI = (820, 12, 64, 64)
+PLAYER_ROI = (820, 12, 64, 64)
+ALLY0_ROI = (740, 12, 64, 64)
+ALLY1_ROI = (660, 12, 64, 64)
+ENEMY0_ROI = (1000, 12, 64, 64)
+ENEMY1_ROI = (1080, 12, 64, 64)
 INV0_ROI = (860, 960, 64, 64)
 INV1_ROI = (932, 960, 64, 64)
 
@@ -64,6 +68,23 @@ def make_invoker(size: int = 64) -> bytes:
     return bytes(buf)
 
 
+def make_shadow_fiend(size: int = 64) -> bytes:
+    buf = solid(size, size, 30, 10, 10)
+    paint_rect(buf, size, 8, 8, 56, 56, 90, 20, 20)
+    paint_rect(buf, size, 18, 22, 30, 46, 200, 40, 40)
+    paint_rect(buf, size, 34, 22, 46, 46, 200, 40, 40)
+    paint_rect(buf, size, 24, 8, 40, 20, 240, 220, 60)
+    return bytes(buf)
+
+
+def make_queen_of_pain(size: int = 64) -> bytes:
+    buf = solid(size, size, 60, 10, 70)
+    paint_rect(buf, size, 10, 10, 54, 54, 140, 30, 160)
+    paint_rect(buf, size, 22, 18, 42, 48, 240, 120, 200)
+    paint_rect(buf, size, 28, 6, 36, 18, 255, 220, 240)
+    return bytes(buf)
+
+
 def make_blink(size: int = 64) -> bytes:
     buf = solid(size, size, 20, 80, 40)
     paint_rect(buf, size, 10, 10, 54, 54, 40, 180, 90)
@@ -92,11 +113,29 @@ def main() -> None:
     icons = {
         "heroes/pudge.png": make_pudge(),
         "heroes/invoker.png": make_invoker(),
+        "heroes/shadow_fiend.png": make_shadow_fiend(),
+        "heroes/queen_of_pain.png": make_queen_of_pain(),
         "items/blink_dagger.png": make_blink(),
         "items/bottle.png": make_bottle(),
     }
     for rel, data in icons.items():
         write_png(TEMPLATES / rel, 64, 64, data)
+
+    catalog = {
+        "heroes": [
+            {"id": "pudge", "name_ru": "Pudge", "file": "heroes/pudge.png"},
+            {"id": "invoker", "name_ru": "Invoker", "file": "heroes/invoker.png"},
+            {"id": "shadow_fiend", "name_ru": "Shadow Fiend", "file": "heroes/shadow_fiend.png"},
+            {"id": "queen_of_pain", "name_ru": "Queen of Pain", "file": "heroes/queen_of_pain.png"},
+        ],
+        "items": [
+            {"id": "blink_dagger", "name_ru": "Blink Dagger", "file": "items/blink_dagger.png"},
+            {"id": "bottle", "name_ru": "Bottle", "file": "items/bottle.png"},
+        ],
+    }
+    (TEMPLATES / "catalog.json").write_text(
+        json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
     # Dark HUD canvas with icons placed at known ROIs
     w, h = 1920, 1080
@@ -104,7 +143,11 @@ def main() -> None:
     paint_rect(canvas, w, 0, 0, w, 88, 28, 30, 36)
     paint_rect(canvas, w, 800, 900, 1120, 1080, 24, 26, 30)
 
-    blit(canvas, w, HERO_ROI[0], HERO_ROI[1], icons["heroes/pudge.png"], 64, 64)
+    blit(canvas, w, PLAYER_ROI[0], PLAYER_ROI[1], icons["heroes/pudge.png"], 64, 64)
+    blit(canvas, w, ALLY0_ROI[0], ALLY0_ROI[1], icons["heroes/invoker.png"], 64, 64)
+    blit(canvas, w, ALLY1_ROI[0], ALLY1_ROI[1], icons["heroes/shadow_fiend.png"], 64, 64)
+    blit(canvas, w, ENEMY0_ROI[0], ENEMY0_ROI[1], icons["heroes/queen_of_pain.png"], 64, 64)
+    blit(canvas, w, ENEMY1_ROI[0], ENEMY1_ROI[1], icons["heroes/invoker.png"], 64, 64)
     blit(canvas, w, INV0_ROI[0], INV0_ROI[1], icons["items/blink_dagger.png"], 64, 64)
     blit(canvas, w, INV1_ROI[0], INV1_ROI[1], icons["items/bottle.png"], 64, 64)
 
@@ -113,10 +156,14 @@ def main() -> None:
 
     expected = {
         "hero_id": "pudge",
+        "ally_ids": ["invoker", "shadow_fiend"],
+        "enemy_ids": ["queen_of_pain", "invoker"],
         "inventory_ids": ["blink_dagger", "bottle"],
+        "demo_opponent_id": "invoker",
+        "demo_level": 5,
         "layout": "synthetic-fullhd-1080",
         "resolution": [1920, 1080],
-        "note_ru": "Синтетический HUD для тестов V0.5 (не скриншот реальной Dota).",
+        "note_ru": "Синтетический HUD для тестов статуса распознавания (не скриншот реальной Dota).",
     }
     (FIXTURES / "match_hud_expected.json").write_text(
         json.dumps(expected, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

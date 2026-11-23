@@ -37,6 +37,12 @@ public sealed class StubScreenCapture : IScreenCapture
         }
     }
 
+    public bool TryCloneLatestPixels(out CapturePixelFrame? frame)
+    {
+        frame = null;
+        return false;
+    }
+
     public Task StartAsync(CancellationToken cancellationToken = default)
     {
         lock (_sync)

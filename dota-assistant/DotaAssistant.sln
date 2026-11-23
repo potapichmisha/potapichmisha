@@ -1,10 +1,18 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.App", "src\DotaAssistant.App\DotaAssistant.App.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Capture", "src\DotaAssistant.Capture\DotaAssistant.Capture.csproj", "{B2C3D4E5-F6A7-8901-BCDE-F12345678901}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FE6D361F-8192-450F-A88C-A8A8CD3F4560}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Vision", "src\DotaAssistant.Vision\DotaAssistant.Vision.csproj", "{5730D8A8-B491-4FCF-B835-856E5082FF4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BCAB5C78-9B2C-4123-9C8B-6A7D19E55E6A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotaAssistant.Vision.Tests", "tests\DotaAssistant.Vision.Tests\DotaAssistant.Vision.Tests.csproj", "{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,5 +28,17 @@ Global
 		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C3D4E5-F6A7-8901-BCDE-F12345678901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5730D8A8-B491-4FCF-B835-856E5082FF4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5730D8A8-B491-4FCF-B835-856E5082FF4B} = {FE6D361F-8192-450F-A88C-A8A8CD3F4560}
+		{41EFFCFC-074A-4E4B-9D66-939FB923BDD4} = {BCAB5C78-9B2C-4123-9C8B-6A7D19E55E6A}
 	EndGlobalSection
 EndGlobal

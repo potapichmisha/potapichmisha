@@ -1,0 +1,13 @@
+{
+  "hero_id": "pudge",
+  "inventory_ids": [
+    "blink_dagger",
+    "bottle"
+  ],
+  "layout": "synthetic-fullhd-1080",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "note_ru": "Синтетический HUD для тестов V0.5 (не скриншот реальной Dota)."
+}

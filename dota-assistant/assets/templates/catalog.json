@@ -1,0 +1,26 @@
+{
+  "heroes": [
+    {
+      "id": "pudge",
+      "name_ru": "Pudge",
+      "file": "heroes/pudge.png"
+    },
+    {
+      "id": "invoker",
+      "name_ru": "Invoker",
+      "file": "heroes/invoker.png"
+    }
+  ],
+  "items": [
+    {
+      "id": "blink_dagger",
+      "name_ru": "Blink Dagger",
+      "file": "items/blink_dagger.png"
+    },
+    {
+      "id": "bottle",
+      "name_ru": "Bottle",
+      "file": "items/bottle.png"
+    }
+  ]
+}

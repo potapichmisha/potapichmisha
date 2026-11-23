@@ -9,12 +9,13 @@
     <RootNamespace>DotaAssistant.App</RootNamespace>
     <AssemblyName>DotaAssistant</AssemblyName>
     <Product>Помощник Dota 2</Product>
-    <Description>V0.5: DXGI-захват + ROI/template matching героя и предметов.</Description>
+    <Description>V1-alpha: DXGI + ROI/templates + mid tips (builds + matchups).</Description>
     <!-- WinUI 3 blocked in cloud Linux scaffold; WPF is the approved fallback. -->
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotaAssistant.Capture\DotaAssistant.Capture.csproj" />
     <ProjectReference Include="..\DotaAssistant.Vision\DotaAssistant.Vision.csproj" />
+    <ProjectReference Include="..\DotaAssistant.Tips\DotaAssistant.Tips.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\assets\**\*"

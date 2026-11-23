@@ -1,0 +1,255 @@
+{
+  "version": "1-alpha",
+  "lane": "mid",
+  "note_ru": "Локальная статичная база mid-советов. Не live-мета. Ручная курация для новичков.",
+  "items": {
+    "boots": {
+      "name_ru": "Boots of Speed",
+      "why_ru": "скорость на линии и отход от гангов"
+    },
+    "bottle": {
+      "name_ru": "Bottle",
+      "why_ru": "мана и реген за счёт рун"
+    },
+    "magic_wand": {
+      "name_ru": "Magic Wand",
+      "why_ru": "запас HP/маны в размене"
+    },
+    "null_talisman": {
+      "name_ru": "Null Talisman",
+      "why_ru": "дешёвый старт для интеллект-мида"
+    },
+    "blink_dagger": {
+      "name_ru": "Blink Dagger",
+      "why_ru": "инициация и мобильность"
+    },
+    "force_staff": {
+      "name_ru": "Force Staff",
+      "why_ru": "сейв себе и тиммейтам"
+    },
+    "hand_of_midas": {
+      "name_ru": "Hand of Midas",
+      "why_ru": "ускорение фарма и уровней"
+    },
+    "aghanims_scepter": {
+      "name_ru": "Aghanim's Scepter",
+      "why_ru": "усиление ульты / ключевых скиллов"
+    },
+    "black_king_bar": {
+      "name_ru": "Black King Bar",
+      "why_ru": "иммунитет к магии в файтах"
+    },
+    "orchid": {
+      "name_ru": "Orchid Malevolence",
+      "why_ru": "сайленс и урон по одиночной цели"
+    }
+  },
+  "builds": [
+    {
+      "hero_id": "pudge",
+      "name_ru": "Pudge mid (стартер)",
+      "core": [
+        "boots",
+        "bottle",
+        "magic_wand",
+        "blink_dagger",
+        "force_staff",
+        "aghanims_scepter"
+      ]
+    },
+    {
+      "hero_id": "invoker",
+      "name_ru": "Invoker mid (стартер)",
+      "core": [
+        "null_talisman",
+        "boots",
+        "bottle",
+        "hand_of_midas",
+        "blink_dagger",
+        "black_king_bar"
+      ]
+    },
+    {
+      "hero_id": "shadow_fiend",
+      "name_ru": "Shadow Fiend mid (стартер)",
+      "core": [
+        "boots",
+        "bottle",
+        "magic_wand",
+        "blink_dagger",
+        "black_king_bar",
+        "aghanims_scepter"
+      ]
+    },
+    {
+      "hero_id": "queen_of_pain",
+      "name_ru": "Queen of Pain mid (стартер)",
+      "core": [
+        "null_talisman",
+        "boots",
+        "bottle",
+        "orchid",
+        "blink_dagger",
+        "black_king_bar"
+      ]
+    }
+  ],
+  "matchups": [
+    {
+      "hero_id": "pudge",
+      "opponent_id": "invoker",
+      "level_min": 1,
+      "level_max": 5,
+      "aggression": "cautious"
+    },
+    {
+      "hero_id": "pudge",
+      "opponent_id": "invoker",
+      "level_min": 6,
+      "level_max": 12,
+      "aggression": "farm"
+    },
+    {
+      "hero_id": "pudge",
+      "opponent_id": "invoker",
+      "level_min": 13,
+      "level_max": 30,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "pudge",
+      "level_min": 1,
+      "level_max": 5,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "pudge",
+      "level_min": 6,
+      "level_max": 30,
+      "aggression": "cautious"
+    },
+    {
+      "hero_id": "pudge",
+      "opponent_id": "shadow_fiend",
+      "level_min": 1,
+      "level_max": 6,
+      "aggression": "call_support"
+    },
+    {
+      "hero_id": "pudge",
+      "opponent_id": "shadow_fiend",
+      "level_min": 7,
+      "level_max": 30,
+      "aggression": "farm"
+    },
+    {
+      "hero_id": "shadow_fiend",
+      "opponent_id": "pudge",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "queen_of_pain",
+      "level_min": 1,
+      "level_max": 8,
+      "aggression": "cautious"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "queen_of_pain",
+      "level_min": 9,
+      "level_max": 30,
+      "aggression": "farm"
+    },
+    {
+      "hero_id": "queen_of_pain",
+      "opponent_id": "invoker",
+      "level_min": 1,
+      "level_max": 6,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "queen_of_pain",
+      "opponent_id": "invoker",
+      "level_min": 7,
+      "level_max": 30,
+      "aggression": "cautious"
+    },
+    {
+      "hero_id": "shadow_fiend",
+      "opponent_id": "queen_of_pain",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "farm"
+    },
+    {
+      "hero_id": "queen_of_pain",
+      "opponent_id": "shadow_fiend",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "pudge",
+      "opponent_id": "queen_of_pain",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "call_support"
+    },
+    {
+      "hero_id": "queen_of_pain",
+      "opponent_id": "pudge",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "shadow_fiend",
+      "level_min": 1,
+      "level_max": 6,
+      "aggression": "farm"
+    },
+    {
+      "hero_id": "invoker",
+      "opponent_id": "shadow_fiend",
+      "level_min": 7,
+      "level_max": 30,
+      "aggression": "press"
+    },
+    {
+      "hero_id": "shadow_fiend",
+      "opponent_id": "invoker",
+      "level_min": 1,
+      "level_max": 30,
+      "aggression": "cautious"
+    }
+  ],
+  "phrases": {
+    "press": "Дави линию: на {level} уровне у тебя преимущество против {opponent}.",
+    "cautious": "Осторожно против {opponent} на {level} уровне — не лезь в размен без нужды.",
+    "farm": "Фарми крипов против {opponent}: сейчас важнее уровень и предметы, не киллы.",
+    "call_support": "Зови саппорта: соло против {opponent} на {level} уровне рискованно.",
+    "next_item": "{item} — {why}",
+    "build_complete": "Ключевые предметы из mid-сборки уже куплены.",
+    "unknown_build": "Нет mid-сборки для героя «{hero}» в локальной базе V1-alpha.",
+    "unknown_matchup": "Нет правила mid-матчапа: {hero} против {opponent}.",
+    "need_opponent": "Герой распознан, но оппонент mid неизвестен — совет по агрессии недоступен.",
+    "demo_context": "Демо mid: {hero} против {opponent}, уровень {level}."
+  },
+  "hero_names_ru": {
+    "pudge": "Pudge",
+    "invoker": "Invoker",
+    "shadow_fiend": "Shadow Fiend",
+    "queen_of_pain": "Queen of Pain"
+  },
+  "demo": {
+    "opponent_id": "invoker",
+    "level": 5,
+    "note_ru": "Пока живое распознавание оппонента/уровня не готово — демо-контекст для фикстуры."
+  }
+}

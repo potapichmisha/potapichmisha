@@ -1,9 +1,13 @@
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using DotaAssistant.App.Services;
 using DotaAssistant.Capture;
+using DotaAssistant.Tips.Engine;
+using DotaAssistant.Tips.Models;
+using DotaAssistant.Tips.Rules;
 using DotaAssistant.Vision.Catalog;
 using DotaAssistant.Vision.Recognition;
 
@@ -16,6 +20,7 @@ public partial class MainWindow : Window
     private IScreenCapture? _capture;
     private readonly DispatcherTimer _statsTimer;
     private bool _contentVisible = true;
+    private TipEngine? _tipEngine;
 
     public MainWindow()
     {
@@ -44,6 +49,7 @@ public partial class MainWindow : Window
 
         _chrome.Apply(UiDisplayMode.SeparateWindow);
         UpdateModeBadge();
+        TryLoadTipEngine();
 
         await StartCaptureAsync().ConfigureAwait(true);
         _statsTimer.Start();
@@ -57,6 +63,27 @@ public partial class MainWindow : Window
         {
             await _capture.DisposeAsync().ConfigureAwait(true);
             _capture = null;
+        }
+    }
+
+    private void TryLoadTipEngine()
+    {
+        try
+        {
+            var tipsDir = Path.Combine(AppContext.BaseDirectory, "assets", "tips");
+            if (!Directory.Exists(tipsDir))
+            {
+                TipsStatusText.Text = "Не найден assets/tips. Пересоберите проект.";
+                return;
+            }
+
+            _tipEngine = new TipEngine(TipRulesStore.LoadFromTipsDirectory(tipsDir));
+            TipsStatusText.Text = "Правила mid загружены. Нажмите «Тест на фикстуре + советы».";
+        }
+        catch (Exception ex)
+        {
+            _tipEngine = null;
+            TipsStatusText.Text = $"Не удалось загрузить советы: {ex.Message}";
         }
     }
 
@@ -191,11 +218,73 @@ public partial class MainWindow : Window
             }
 
             RecognitionStatusText.Text = "Ок: тест на синтетической фикстуре (не кадр живой Dota).";
+            ApplyTipsFromRecognition(result.Hero?.Id, result.InventoryItems.Select(i => i.Id).ToArray());
         }
         catch (Exception ex)
         {
             RecognitionStatusText.Text = $"Ошибка распознавания: {ex.Message}";
         }
+    }
+
+    private void ApplyTipsFromRecognition(string? heroId, IReadOnlyList<string> ownedItemIds)
+    {
+        if (_tipEngine is null)
+        {
+            TryLoadTipEngine();
+        }
+
+        if (_tipEngine is null)
+        {
+            TipsMatchupText.Text = "—";
+            TipsItemsText.Text = "—";
+            TipsContextText.Text = "Контекст: движок советов не загружен.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(heroId))
+        {
+            TipsContextText.Text = "Контекст: герой не распознан — советы недоступны.";
+            TipsMatchupText.Text = "—";
+            TipsItemsText.Text = "—";
+            TipsStatusText.Text = "Сначала нужен уверенный герой (фикстура или живое распознавание).";
+            return;
+        }
+
+        var context = _tipEngine.EnrichWithDemoDefaults(new TipContext
+        {
+            HeroId = heroId,
+            OwnedItemIds = ownedItemIds
+        });
+        var advice = _tipEngine.Advise(context);
+
+        TipsContextText.Text = advice.DemoContextRu
+            ?? $"Контекст: {_tipEngine.Store.HeroNameRu(heroId)}, уровень {context.Level}.";
+
+        TipsMatchupText.Text = advice.Matchup?.PhraseRu
+            ?? advice.MatchupStatusRu
+            ?? "—";
+
+        if (advice.NextItems.Count == 0)
+        {
+            TipsItemsText.Text = advice.BuildStatusRu ?? "—";
+        }
+        else
+        {
+            var sb = new StringBuilder();
+            for (var i = 0; i < advice.NextItems.Count; i++)
+            {
+                if (i > 0)
+                {
+                    sb.AppendLine();
+                }
+
+                sb.Append($"{i + 1}. {advice.NextItems[i].PhraseRu}");
+            }
+
+            TipsItemsText.Text = sb.ToString();
+        }
+
+        TipsStatusText.Text = "Локальные JSON-правила mid · шаблонные фразы · без LLM.";
     }
 
     private void TitleBar_OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

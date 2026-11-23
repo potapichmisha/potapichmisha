@@ -4,10 +4,12 @@
     "blink_dagger",
     "bottle"
   ],
+  "demo_opponent_id": "invoker",
+  "demo_level": 5,
   "layout": "synthetic-fullhd-1080",
   "resolution": [
     1920,
     1080
   ],
-  "note_ru": "Синтетический HUD для тестов V0.5 (не скриншот реальной Dota)."
+  "note_ru": "Синтетический HUD для тестов V0.5/V1-alpha (не скриншот реальной Dota). Оппонент/уровень — демо для советов mid."
 }

@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Помощник Dota 2"
-        Width="420" Height="640"
-        MinWidth="360" MinHeight="520"
+        Width="440" Height="760"
+        MinWidth="360" MinHeight="560"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -142,7 +142,7 @@
                      Foreground="{StaticResource MutedBrush}"
                      FontSize="12"
                      Margin="0,0,0,12"
-                     Text="Рекомендуемый режим Dota 2: Borderless Windowed. Живое распознавание с DXGI-кадра — следующий шаг; сейчас доступен тест на фикстуре."/>
+                     Text="Рекомендуемый режим Dota 2: Borderless Windowed. Живое распознавание с DXGI-кадра — позже; сейчас — тест на фикстуре + mid-советы."/>
 
           <TextBlock Text="Распознавание (V0.5)"
                      Foreground="{StaticResource TextBrush}"
@@ -163,12 +163,50 @@
                          FontSize="11"
                          Margin="0,6,0,0"
                          TextWrapping="Wrap"
-                         Text="Нажмите кнопку, чтобы распознать тестовый HUD (синтетическая картинка)."/>
-              <Button Content="Тест на фикстуре"
+                         Text="Нажмите кнопку: распознать тестовый HUD и показать mid-советы."/>
+              <Button Content="Тест на фикстуре + советы"
                       Margin="0,10,0,0"
                       Padding="14,6"
                       HorizontalAlignment="Left"
                       Click="RunFixtureRecognition_OnClick"/>
+            </StackPanel>
+          </Border>
+
+          <TextBlock Text="Советы mid (V1-alpha)"
+                     Foreground="{StaticResource TextBrush}"
+                     FontWeight="SemiBold"
+                     Margin="0,0,0,6"/>
+          <Border Background="#22141A28" CornerRadius="6" Padding="10" Margin="0,0,0,12">
+            <StackPanel>
+              <TextBlock x:Name="TipsContextText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="11"
+                         TextWrapping="Wrap"
+                         Text="Контекст: —"/>
+              <TextBlock Text="Матчап"
+                         Foreground="{StaticResource TextBrush}"
+                         FontWeight="SemiBold"
+                         Margin="0,10,0,4"/>
+              <TextBlock x:Name="TipsMatchupText"
+                         Foreground="{StaticResource AccentBrush}"
+                         FontSize="13"
+                         TextWrapping="Wrap"
+                         Text="—"/>
+              <TextBlock Text="Следующие предметы"
+                         Foreground="{StaticResource TextBrush}"
+                         FontWeight="SemiBold"
+                         Margin="0,12,0,4"/>
+              <TextBlock x:Name="TipsItemsText"
+                         Foreground="{StaticResource TextBrush}"
+                         FontSize="13"
+                         TextWrapping="Wrap"
+                         Text="—"/>
+              <TextBlock x:Name="TipsStatusText"
+                         Foreground="{StaticResource MutedBrush}"
+                         FontSize="11"
+                         Margin="0,8,0,0"
+                         TextWrapping="Wrap"
+                         Text="Шаблонные фразы из локального JSON. Без LLM."/>
             </StackPanel>
           </Border>
 
@@ -191,7 +229,7 @@
           <TextBlock Margin="0,16,0,0"
                      FontSize="11"
                      Foreground="{StaticResource MutedBrush}"
-                     Text="V0.5 · ROI + шаблоны · без LLM · Windows"/>
+                     Text="V1-alpha · mid tips · шаблоны RU · без LLM · Windows"/>
         </StackPanel>
       </ScrollViewer>
     </DockPanel>
